@@ -1,8 +1,22 @@
-# Implementing a Paper
+# Implementing Llama
 
 I want to provide some tips from my experience implementing a paper. I'm going to cover my tips so far from implementing a dramatically scaled-down version of [Llama](https://arxiv.org/pdf/2302.13971.pdf) for training [TinyShakespeare](https://github.com/karpathy/char-rnn/blob/master/data/tinyshakespeare/input.txt). This post is heavily inspired by Karpathy's [Makemore series](https://www.youtube.com/playlist?list=PLAqhIrjkxbuWI23v9cThsA9GvCAUhRvKZ), which I highly recommend.
 
 I'm only going to *loosely* follow the layout of their paper; while the formatting and order of sections makes sense for publication, we're going to be implementing the paper. I'll also be skipping over some of the more obvious steps, like setting up a virtual environment and installing dependencies.
+
+## Takeaways
+
+## Always work iteratively: start small, stay certain, and build up.
+My approach for implementing papers is:
+1. Make all of the helper functions required to test your model quantitatively (data splits, training, plotting the loss).
+1. Before you even look at the paper, pick a small, simple, and fast model that you've done in the past. Then make a helper function to evaluate the model qualitatively.
+1. Start by picking apart different components of the paper, and then implementing them one-by-one, training and evaluating as you go.
+
+## Make sure your layers do what you think.
+1. Use `.shape` religiously.
+1. Work out the results without matrix multiplication first, and then use the `torch` functions to make it efficient after.
+1. Have a test to see that your layer is right. For example, the RoPE embeddings have a specific property that you can test for. For the Transformer, you can test that the attention is working by looking at the attention map.
+1. Test your layers on various batch, sequence, and embedding sizes. Even if it works for one size, it might not work for others, which will cause problems at inference time.
 
 ## About Llama
 
@@ -1507,20 +1521,3 @@ show_grads(llama_with_cosine, 1e-5)
 
 
 Even at an extremely low tolerance, the attention biases are not getting any signal. I'm not sure why the learning schedule from the paper doesn't work, but the lesson here is simple: start simple.
-
-# Takeaways
-
-## Always work iteratively: start small, stay certain, and build up.
-My approach for implementing papers is:
-1. Make all of the helper functions required to test your model quantitatively (data splits, training, plotting the loss).
-1. Before you even look at the paper, pick a small, simple, and fast model that you've done in the past. Then make a helper function to evaluate the model qualitatively.
-1. Start by picking apart different components of the paper, and then implementing them one-by-one, training and evaluating as you go.
-
-## Make sure your layers do what you think.
-1. Use `.shape` religiously.
-1. Work out the results without matrix multiplication first, and then use the `torch` functions to make it efficient after.
-1. Have a test to see that your layer is right. For example, the RoPE embeddings have a specific property that you can test for. For the Transformer, you can test that the attention is working by looking at the attention map.
-1. Test your layers on various batch, sequence, and embedding sizes. Even if it works for one size, it might not work for others, which will cause problems at inference time.
-
-
-
