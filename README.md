@@ -6,13 +6,13 @@ I'm only going to *loosely* follow the layout of their paper; while the formatti
 
 ## Takeaways
 
-## Always work iteratively: start small, stay certain, and build up.
+### Always work iteratively: start small, stay certain, and build up.
 My approach for implementing papers is:
 1. Make all of the helper functions required to test your model quantitatively (data splits, training, plotting the loss).
 1. Before you even look at the paper, pick a small, simple, and fast model that you've done in the past. Then make a helper function to evaluate the model qualitatively.
 1. Start by picking apart different components of the paper, and then implementing them one-by-one, training and evaluating as you go.
 
-## Make sure your layers do what you think.
+### Make sure your layers do what you think.
 1. Use `.shape` religiously.
 1. Work out the results without matrix multiplication first, and then use the `torch` functions to make it efficient after.
 1. Have a test to see that your layer is right. For example, the RoPE embeddings have a specific property that you can test for. For the Transformer, you can test that the attention is working by looking at the attention map.
