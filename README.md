@@ -1,4 +1,4 @@
-# Implementing a Paper
+# Llama from scratch
 
 I want to provide some tips from my experience implementing a paper. I'm going to cover my tips so far from implementing a dramatically scaled-down version of [Llama](https://arxiv.org/pdf/2302.13971.pdf) for training [TinyShakespeare](https://github.com/karpathy/char-rnn/blob/master/data/tinyshakespeare/input.txt). This post is heavily inspired by Karpathy's [Makemore series](https://www.youtube.com/playlist?list=PLAqhIrjkxbuWI23v9cThsA9GvCAUhRvKZ), which I highly recommend.
 
@@ -574,7 +574,7 @@ for i in range(K):
     
 
 
-Let's make sure these work. They should exhibit the quality that 
+Let's make sure these work. They should exhibit the quality that
 $$
 q_m^T k_n = (R^d_{\Theta, m}W_q x_m)^T (R^d_{\Theta, n} W_k x_n) = x^T W_q R^d_{\Theta, n-m} W_k x_n.
 $$
