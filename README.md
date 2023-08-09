@@ -1,22 +1,23 @@
-# Implementing Llama
+# Implementing a Paper
 
 I want to provide some tips from my experience implementing a paper. I'm going to cover my tips so far from implementing a dramatically scaled-down version of [Llama](https://arxiv.org/pdf/2302.13971.pdf) for training [TinyShakespeare](https://github.com/karpathy/char-rnn/blob/master/data/tinyshakespeare/input.txt). This post is heavily inspired by Karpathy's [Makemore series](https://www.youtube.com/playlist?list=PLAqhIrjkxbuWI23v9cThsA9GvCAUhRvKZ), which I highly recommend.
 
 I'm only going to *loosely* follow the layout of their paper; while the formatting and order of sections makes sense for publication, we're going to be implementing the paper. I'll also be skipping over some of the more obvious steps, like setting up a virtual environment and installing dependencies.
 
-## Takeaways
+# Takeaways
 
-### Always work iteratively: start small, stay certain, and build up.
+## Always work iteratively: start small, stay certain, and build up.
 My approach for implementing papers is:
 1. Make all of the helper functions required to test your model quantitatively (data splits, training, plotting the loss).
 1. Before you even look at the paper, pick a small, simple, and fast model that you've done in the past. Then make a helper function to evaluate the model qualitatively.
 1. Start by picking apart different components of the paper, and then implementing them one-by-one, training and evaluating as you go.
 
-### Make sure your layers do what you think.
+## Make sure your layers do what you think.
 1. Use `.shape` religiously.
 1. Work out the results without matrix multiplication first, and then use the `torch` functions to make it efficient after.
 1. Have a test to see that your layer is right. For example, the RoPE embeddings have a specific property that you can test for. For the Transformer, you can test that the attention is working by looking at the attention map.
 1. Test your layers on various batch, sequence, and embedding sizes. Even if it works for one size, it might not work for others, which will cause problems at inference time.
+
 
 ## About Llama
 
@@ -114,6 +115,9 @@ def get_batches(data, split, batch_size, context_window, config=MASTER_CONFIG):
     batch_data = train
     if split == 'val':
         batch_data = val
+
+    if split == 'test':
+        batch_data = test
     
     # pick random starting points
     ix = torch.randint(0, batch_data.size(0) - context_window - 1, (batch_size,))
@@ -134,38 +138,38 @@ xs, ys = get_batches(dataset, 'train', MASTER_CONFIG['batch_size'], MASTER_CONFI
 
 
 
-    [(',\nOr rudely visi', '\nOr rudely visit'),
-     ('s of all the pos', ' of all the post'),
-     ('and then the res', 'nd then the rest'),
-     ('ry Bolingbroke d', 'y Bolingbroke do'),
-     ('hing of blood, w', 'ing of blood, wh'),
-     ('ank your ladyshi', 'nk your ladyship'),
-     ('aves, you need n', 'ves, you need no'),
-     ('; blame me not:\n', " blame me not:\n'"),
-     ('judge!\n\nFirst Lo', 'udge!\n\nFirst Lor'),
-     ('gave him way\nIn ', 'ave him way\nIn a'),
-     ('g.\n\nWARWICK:\nAy,', '.\n\nWARWICK:\nAy, '),
-     ('w inly sorrow gr', ' inly sorrow gri'),
-     ('ght have spoken ', 'ht have spoken a'),
-     ('iter\nBecame a bu', 'ter\nBecame a bul'),
-     ('the bones:\nAnd i', 'he bones:\nAnd in'),
-     ("ughter'd English", "ghter'd Englishm"),
-     ('u change your pl', ' change your pla'),
-     ('are a tedious fo', 're a tedious foo'),
-     ('ond?  for the se', 'nd?  for the sel'),
-     ("ng anger'd, puff", "g anger'd, puffs"),
-     ('him.\n\nAll:\nConte', 'im.\n\nAll:\nConten'),
-     ('he more virtuous', 'e more virtuous '),
-     (' deputy-elect,\nA', 'deputy-elect,\nAn'),
-     ('rd, thy supposed', 'd, thy supposed '),
-     ('d eyes?\n\nSICINIU', ' eyes?\n\nSICINIUS'),
-     ('o Romeo!\n\nJULIET', ' Romeo!\n\nJULIET:'),
-     ("complish'd with ", "omplish'd with t"),
-     ('hat is meant lov', 'at is meant love'),
-     ('ET:\nO me, O me! ', 'T:\nO me, O me! M'),
-     (" have learn'd th", "have learn'd the"),
-     ('xcept I cannot d', 'cept I cannot do'),
-     ('enant? for well ', 'nant? for well u')]
+    [('t us sup betimes', ' us sup betimes,'),
+     ('IO:\nRight.\n\nROME', 'O:\nRight.\n\nROMEO'),
+     ('Nurse:\nO, she sa', 'urse:\nO, she say'),
+     (" seem'd to know,", "seem'd to know,\n"),
+     (' let her brother', 'let her brother '),
+     ('ood,\nEven with s', 'od,\nEven with su'),
+     ('en\nWhisper the s', 'n\nWhisper the sp'),
+     (', fly! for all y', ' fly! for all yo'),
+     (" Saint Peter's C", "Saint Peter's Ch"),
+     (', but that\nWhich', ' but that\nWhich '),
+     ('uld as willingly', 'ld as willingly '),
+     ('y brother,\nIs pr', ' brother,\nIs pri'),
+     (' you ready your ', 'you ready your s'),
+     ('rth the audience', 'th the audience '),
+     ('\n\nQUEEN ELIZABET', '\nQUEEN ELIZABETH'),
+     ('ection,\nwhich ca', 'ction,\nwhich can'),
+     ('is wisdom hastes', 's wisdom hastes '),
+     (' and quinces in ', 'and quinces in t'),
+     ('nt death.\n\nSICIN', 't death.\n\nSICINI'),
+     ("y she's mad.\n\nBR", " she's mad.\n\nBRU"),
+     ('eware of him;\nSi', 'ware of him;\nSin'),
+     ('s\nAnd make pursu', '\nAnd make pursui'),
+     ('r and be slain; ', ' and be slain; n'),
+     (' I, with grief a', 'I, with grief an'),
+     ('?\n\nSecond Keeper', '\n\nSecond Keeper:'),
+     ('\nNow, Thomas Mow', 'Now, Thomas Mowb'),
+     ('or this once, ye', 'r this once, yea'),
+     ("l 'tis just.\n\nLU", " 'tis just.\n\nLUC"),
+     ('es like a lamb. ', 's like a lamb. Y'),
+     ('t night, I warra', ' night, I warran'),
+     ('y tears would wa', ' tears would was'),
+     ('\n\nANGELO:\nWell, ', '\nANGELO:\nWell, l')]
 
 
 
@@ -288,7 +292,7 @@ train(model, optimizer)
 ```
 
     model params: 33217
-    validation loss:  3.9408994913101196
+    validation loss:  3.9457355260849
 
 
 
@@ -300,7 +304,7 @@ train(model, optimizer)
 
 
     
-![png](llama_files/llama_21_2.png)
+![png](llama_files/llama_22_2.png)
     
 
 
@@ -356,7 +360,7 @@ train(model, optimizer)
 ```
 
     model params: 33217
-    validation loss:  2.5100526332855226
+    validation loss:  2.5113263607025145
 
 
 
@@ -368,7 +372,7 @@ train(model, optimizer)
 
 
     
-![png](llama_files/llama_23_2.png)
+![png](llama_files/llama_24_2.png)
     
 
 
@@ -397,11 +401,11 @@ generate(model)
 
 
 
-    ['\nAy:\nTI he st,\nFrd ucoirnd\nFute',
-     "\nThieellainowhin'r 'tofail t Ju",
-     '\n\nKIENIUK:\n\nBENCall ke pouth t ',
-     '\n\nWillfel nthe, print ad mbuse?',
-     '\nHARD o PUENo har\nTond towit mm']
+    ['\nWI in\nThed grtend\nA yod ys wit',
+     '\nY aroticunutser\nE oy mendomed ',
+     "\n\nRIf t fan f ses, k be wn'd mo",
+     '\nRu hiseedst den t wat onderyou',
+     "\nARaceps hond wr f\nI' fu kn be "]
 
 
 
@@ -509,7 +513,7 @@ train(model, optimizer)
 ```
 
     model params: 35265
-    validation loss:  2.4489948749542236
+    validation loss:  2.4792869329452514
 
 
 
@@ -521,7 +525,7 @@ train(model, optimizer)
 
 
     
-![png](llama_files/llama_33_2.png)
+![png](llama_files/llama_34_2.png)
     
 
 
@@ -566,7 +570,7 @@ for i in range(K):
 
 
     
-![png](llama_files/llama_37_0.png)
+![png](llama_files/llama_38_0.png)
     
 
 
@@ -641,7 +645,7 @@ class RoPEAttention(nn.Module):
         v_out = (torch.bmm(v.transpose(0,1), self.R)).transpose(0,1)
 
         activations, attn_weights = self.multihead(
-            q,k,v, 
+            q_out,k_out,v_out, 
         )
 
         if return_attn_weights:
@@ -719,6 +723,10 @@ assert torch.allclose(q @ k, x_k.T @ layer.w_k.weight.T @ layer.R[n, :, :].T @ l
 assert torch.allclose(q @ k, x_k.T @ layer.w_k.weight.T @ layer.R[n-m, :, :].T @ layer.w_q.weight @ x_q)
 ```
 
+    /var/folders/w4/2j887mvs097bkhhjpgfzjlyr0000gn/T/ipykernel_17478/2550954139.py:26: UserWarning: The use of `x.T` on tensors of dimension other than 2 to reverse their shape is deprecated and it will throw an error in a future release. Consider `x.mT` to transpose batches of matrices or `x.permute(*torch.arange(x.ndim - 1, -1, -1))` to reverse the dimensions of a tensor. (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/aten/src/ATen/native/TensorShape.cpp:3575.)
+      assert q.T @ k == q @ k # transpose is redundant
+
+
 Now let's inspect the attention weights. Since this is causal, we would expect that due to masking, the upper triangular of the attention should be 0.
 
 
@@ -737,13 +745,13 @@ plt.colorbar()
 
 
 
-    <matplotlib.colorbar.Colorbar at 0x28f9a4350>
+    <matplotlib.colorbar.Colorbar at 0x16c039090>
 
 
 
 
     
-![png](llama_files/llama_47_1.png)
+![png](llama_files/llama_48_1.png)
     
 
 
@@ -785,9 +793,8 @@ class RoPEAttention_wMask(nn.Module):
         k_out = (torch.bmm(k.transpose(0,1), self.R[:m, ...])).transpose(0,1)
         v_out = (torch.bmm(v.transpose(0,1), self.R[:m, ...])).transpose(0,1)
 
-        causal_mask = torch.tril(torch.ones(m,m, requires_grad=False))
         activations, attn_weights = self.multihead(
-            q,k,v, 
+            q_out,k_out,v_out, 
             attn_mask=nn.Transformer.generate_square_subsequent_mask(m),
             is_causal=True
         )
@@ -814,13 +821,13 @@ plt.colorbar()
 
 
 
-    <matplotlib.colorbar.Colorbar at 0x28fe6ac10>
+    <matplotlib.colorbar.Colorbar at 0x16c2c7b50>
 
 
 
 
     
-![png](llama_files/llama_50_1.png)
+![png](llama_files/llama_51_1.png)
     
 
 
@@ -874,7 +881,7 @@ train(model, optimizer)
 ```
 
     model params: 150465
-    validation loss:  1.9507311224937438
+    validation loss:  2.1157416343688964
 
 
 
@@ -886,7 +893,7 @@ train(model, optimizer)
 
 
     
-![png](llama_files/llama_52_2.png)
+![png](llama_files/llama_53_2.png)
     
 
 
@@ -895,23 +902,13 @@ It looks like we can drive our loss down even lower. Let's do that by updating m
 
 ```python
 MASTER_CONFIG.update({
-    "epochs": 2000,
+    "epochs": 5000,
     "log_interval": 10,
 })
-```
-
-
-```python
-model = RopeModel(MASTER_CONFIG)
-xs, ys = get_batches(dataset, 'train', MASTER_CONFIG['batch_size'], MASTER_CONFIG['context_window'])
-
-logits, loss = model(xs, ys)
-optimizer = torch.optim.Adam(model.parameters())
 train(model, optimizer)
 ```
 
-    model params: 150465
-    validation loss:  2.168288516998291
+    validation loss:  1.9027801871299743
 
 
 
@@ -1010,7 +1007,7 @@ train(model, optimizer)
 ```
 
     model params: 183490
-    validation loss:  2.1011534452438356
+    validation loss:  1.8666490197181702
 
 
 
@@ -1097,11 +1094,11 @@ class Llama(nn.Module):
 
 llama = Llama(MASTER_CONFIG)
 optimizer = torch.optim.Adam(llama.parameters())
-train(llama, optimizer, MASTER_CONFIG)
+train(llama, optimizer, config=MASTER_CONFIG)
 ```
 
     model params: 733382
-    validation loss:  1.8632867693901063
+    validation loss:  1.616115140914917
 
 
 
@@ -1127,7 +1124,7 @@ MASTER_CONFIG.update({
 train(llama, optimizer, scheduler=None, config=MASTER_CONFIG)
 ```
 
-    validation loss:  1.0796078860759735
+    validation loss:  0.9024032115936279
 
 
 
@@ -1147,10 +1144,10 @@ It seems we can go even lower, still without serious overfitting. Either there i
 
 
 ```python
-train(llama, optimizer, MASTER_CONFIG)
+train(llama, optimizer, config=MASTER_CONFIG)
 ```
 
-    validation loss:  1.0959919810295105
+    validation loss:  0.746810007095337
 
 
 
@@ -1172,29 +1169,47 @@ print(generate(llama, MASTER_CONFIG, 500)[0])
 ```
 
     
-    That what swas widep to &neder theep save life
-    Hem,
-    Morecon! Is from, an go thinks of which with I'?
+    Evend her break of thou thire xoing dieble had side, did foesors exenatedH in siffied up,
+    No, none,
+    And you ling as thought depond.
     
-    Old Marciush, thus, i'll drawnt we'll an that be Callay,
-    So, leartet,
-    So swomet
+    MENENIUS:
+    Tell officien:
+    To pesiding be
+    Best wanty and to spiege,
+    To uncine shee patss again,
+    I will hen: then they
+    Moieth:
+    I my cast in letch:
+    For bereful, give toan I may
     
-    You is gicfevers,
-    Ind law I drult I compland--Pair: the love boe salithese;
-    Forole:
-    I doth not they, you advinest's pared, ah, by: dark, you thy liord underanus's the vily:
-     onever of romb't and vust both though,
-    loade wath you'll, eself sway mishty would.
+    LINT OF AUMERLE:
+    Out, or me but thee here sir,
+    Why first with canse pring;
+    Now!
     
-    Peace
-    FRARD:
-    Now, gorse:
-    Who I mall to nued, should sould.
+    Gide me couuse
+    The haster:
+    And suilt harming,
+    Then as pereise with and go.
     
+    FROMNIUS:
+    I well? speak and wieke ac
 
 
-At this point, we've hit the bottom with our training.
+At this point, we've hit the bottom with our training. Let's test on the test set.
+
+
+```python
+xs, ys = get_batches(dataset, 'test', MASTER_CONFIG['batch_size'], MASTER_CONFIG['context_window'])
+
+logits, loss = llama(xs, ys)
+
+print(loss)
+```
+
+    tensor(0.8304, grad_fn=<NllLossBackward0>)
+
 
 # Miscellaneous
 
@@ -1214,69 +1229,70 @@ show_grads(llama)
 
 
 
-    [('llama_blocks.llama_0.attention.multihead.in_proj_bias', 38.020833333333336),
-     ('llama_blocks.llama_1.attention.multihead.in_proj_bias', 37.760416666666664),
-     ('llama_blocks.llama_3.attention.multihead.in_proj_bias', 36.979166666666664),
-     ('llama_blocks.llama_2.attention.multihead.in_proj_bias', 35.9375),
-     ('llama_blocks.llama_0.attention.multihead.in_proj_weight', 16.510009765625),
-     ('llama_blocks.llama_0.attention.w_q.weight', 13.07373046875),
-     ('llama_blocks.llama_0.attention.multihead.out_proj.weight', 12.548828125),
-     ('llama_blocks.llama_0.attention.w_k.weight', 12.3779296875),
-     ('llama_blocks.llama_1.attention.w_v.weight', 11.822509765625),
-     ('llama_blocks.llama_1.attention.multihead.out_proj.bias', 11.71875),
-     ('llama_blocks.llama_2.attention.w_v.weight', 11.651611328125),
-     ('llama_blocks.llama_1.attention.multihead.out_proj.weight', 11.6455078125),
+    [('llama_blocks.llama_0.attention.multihead.in_proj_bias', 36.71875),
+     ('llama_blocks.llama_3.attention.multihead.in_proj_bias', 35.9375),
+     ('llama_blocks.llama_1.attention.multihead.in_proj_bias', 33.59375),
+     ('llama_blocks.llama_2.attention.multihead.in_proj_bias', 33.333333333333336),
+     ('llama_blocks.llama_0.attention.multihead.in_proj_weight',
+      21.840413411458332),
+     ('llama_blocks.llama_0.attention.w_q.weight', 14.892578125),
+     ('llama_blocks.llama_0.attention.multihead.out_proj.weight', 13.4765625),
+     ('llama_blocks.llama_0.attention.w_k.weight', 12.9638671875),
+     ('llama_blocks.llama_0.attention.w_v.weight', 11.8896484375),
+     ('llama_blocks.llama_1.attention.w_v.weight', 11.285400390625),
+     ('llama_blocks.llama_3.attention.multihead.out_proj.weight', 11.12060546875),
+     ('llama_blocks.llama_2.attention.w_v.weight', 10.68115234375),
+     ('llama_blocks.llama_0.feedforward.0.weight', 10.4248046875),
+     ('llama_blocks.llama_2.attention.multihead.out_proj.weight', 10.36376953125),
+     ('llama_blocks.llama_1.attention.multihead.out_proj.weight', 10.2783203125),
+     ('llama_blocks.llama_3.attention.multihead.out_proj.bias', 10.15625),
+     ('llama_blocks.llama_3.attention.w_v.weight', 9.991455078125),
+     ('llama_blocks.llama_0.feedforward.1.linear.weight', 9.9609375),
      ('llama_blocks.llama_1.attention.multihead.in_proj_weight',
-      11.191813151041666),
-     ('llama_blocks.llama_0.attention.w_v.weight', 11.1572265625),
-     ('llama_blocks.llama_3.attention.w_v.weight', 11.1328125),
-     ('llama_blocks.llama_2.attention.multihead.out_proj.weight', 10.70556640625),
-     ('llama_blocks.llama_0.feedforward.0.weight', 10.53466796875),
-     ('llama_blocks.llama_3.attention.multihead.out_proj.weight', 10.150146484375),
-     ('llama_blocks.llama_1.feedforward.0.weight', 10.1318359375),
-     ('llama_blocks.llama_0.feedforward.1.linear_gate.weight', 10.089111328125),
-     ('llama_blocks.llama_1.attention.w_q.weight', 9.906005859375),
-     ('llama_blocks.llama_0.feedforward.1.linear.weight', 9.6923828125),
-     ('llama_blocks.llama_2.feedforward.1.linear_gate.bias', 9.375),
-     ('llama_blocks.llama_1.feedforward.1.linear.weight', 9.259033203125),
-     ('llama_blocks.llama_1.attention.w_k.weight', 9.246826171875),
-     ('llama_blocks.llama_2.attention.multihead.in_proj_weight', 9.09423828125),
-     ('llama_blocks.llama_1.feedforward.1.linear_gate.weight', 9.075927734375),
-     ('llama_blocks.llama_2.feedforward.0.weight', 8.990478515625),
-     ('llama_blocks.llama_3.attention.multihead.in_proj_weight',
-      8.610026041666666),
-     ('llama_blocks.llama_3.feedforward.0.weight', 8.53271484375),
-     ('llama_blocks.llama_2.feedforward.1.linear.weight', 8.2763671875),
-     ('llama_blocks.llama_2.feedforward.1.linear_gate.weight', 8.209228515625),
-     ('llama_blocks.llama_3.feedforward.1.linear_gate.weight', 7.855224609375),
-     ('llama_blocks.llama_0.feedforward.1.linear_gate.bias', 7.8125),
-     ('llama_blocks.llama_2.feedforward.1.linear.bias', 7.8125),
-     ('llama_blocks.llama_3.feedforward.1.linear.bias', 7.8125),
-     ('llama_blocks.llama_3.feedforward.1.linear.weight', 7.80029296875),
-     ('llama_blocks.llama_3.attention.w_q.weight', 7.623291015625),
-     ('llama_blocks.llama_3.attention.w_k.weight', 7.568359375),
-     ('llama_blocks.llama_2.attention.w_q.weight', 7.33642578125),
-     ('llama_blocks.llama_2.attention.w_k.weight', 7.257080078125),
+      9.908040364583334),
+     ('llama_blocks.llama_2.attention.multihead.in_proj_weight', 9.75341796875),
+     ('llama_blocks.llama_0.feedforward.1.linear_gate.weight', 9.66796875),
+     ('llama_blocks.llama_1.attention.multihead.out_proj.bias', 9.375),
+     ('llama_blocks.llama_3.attention.multihead.in_proj_weight', 9.16748046875),
+     ('llama_blocks.llama_1.feedforward.0.weight', 8.77685546875),
+     ('llama_blocks.llama_0.feedforward.1.linear_gate.bias', 8.59375),
+     ('llama_blocks.llama_2.feedforward.1.linear.bias', 8.59375),
+     ('llama_blocks.llama_2.feedforward.0.weight', 8.4228515625),
+     ('llama_blocks.llama_1.feedforward.1.linear.weight', 7.720947265625),
+     ('llama_blocks.llama_1.feedforward.1.linear_gate.weight', 7.501220703125),
+     ('llama_blocks.llama_3.feedforward.0.weight', 7.440185546875),
+     ('llama_blocks.llama_2.feedforward.1.linear.weight', 7.31201171875),
+     ('llama_blocks.llama_2.feedforward.1.linear_gate.weight', 7.196044921875),
      ('llama_blocks.llama_1.feedforward.1.linear_gate.bias', 7.03125),
-     ('ffn.1.linear.weight', 6.77490234375),
-     ('ffn.0.weight', 6.744384765625),
-     ('ffn.1.linear_gate.weight', 6.689453125),
+     ('llama_blocks.llama_2.attention.multihead.out_proj.bias', 7.03125),
+     ('llama_blocks.llama_2.feedforward.1.linear_gate.bias', 7.03125),
+     ('llama_blocks.llama_2.attention.w_k.weight', 6.94580078125),
+     ('llama_blocks.llama_3.feedforward.1.linear.weight', 6.927490234375),
+     ('llama_blocks.llama_1.attention.w_k.weight', 6.82373046875),
+     ('llama_blocks.llama_2.attention.w_q.weight', 6.82373046875),
+     ('llama_blocks.llama_3.attention.w_k.weight', 6.585693359375),
+     ('llama_blocks.llama_3.feedforward.1.linear_gate.weight', 6.494140625),
+     ('llama_blocks.llama_1.attention.w_q.weight', 6.396484375),
      ('llama_blocks.llama_1.feedforward.1.linear.bias', 6.25),
-     ('llama_blocks.llama_2.attention.multihead.out_proj.bias', 6.25),
-     ('llama_blocks.llama_3.attention.multihead.out_proj.bias', 5.46875),
-     ('ffn.2.weight', 5.46875),
-     ('ffn.1.linear.bias', 4.6875),
-     ('llama_blocks.llama_1.feedforward.0.bias', 3.90625),
-     ('ffn.1.linear_gate.bias', 3.90625),
-     ('llama_blocks.llama_0.feedforward.1.linear.bias', 3.125),
-     ('llama_blocks.llama_2.feedforward.0.bias', 3.125),
-     ('llama_blocks.llama_3.feedforward.1.linear_gate.bias', 3.125),
-     ('llama_blocks.llama_0.attention.multihead.out_proj.bias', 2.34375),
-     ('llama_blocks.llama_3.feedforward.0.bias', 1.5625),
-     ('ffn.0.bias', 1.5625),
-     ('llama_blocks.llama_0.feedforward.0.bias', 0.78125),
-     ('embeddings.weight', 0.7211538461538461),
-     ('llama_blocks.llama_0.rms.scale', 0.244140625),
+     ('llama_blocks.llama_3.feedforward.1.linear.bias', 6.25),
+     ('llama_blocks.llama_3.attention.w_q.weight', 6.2255859375),
+     ('ffn.0.weight', 5.633544921875),
+     ('llama_blocks.llama_0.feedforward.1.linear.bias', 5.46875),
+     ('ffn.1.linear_gate.bias', 5.46875),
+     ('ffn.1.linear_gate.weight', 5.2978515625),
+     ('ffn.1.linear.weight', 5.26123046875),
+     ('ffn.2.weight', 4.447115384615385),
+     ('ffn.1.linear.bias', 3.90625),
+     ('llama_blocks.llama_0.feedforward.0.bias', 3.125),
+     ('ffn.2.bias', 3.076923076923077),
+     ('llama_blocks.llama_3.feedforward.0.bias', 2.34375),
+     ('ffn.0.bias', 2.34375),
+     ('llama_blocks.llama_0.attention.multihead.out_proj.bias', 1.5625),
+     ('llama_blocks.llama_2.feedforward.0.bias', 1.5625),
+     ('llama_blocks.llama_3.feedforward.1.linear_gate.bias', 1.5625),
+     ('llama_blocks.llama_1.feedforward.0.bias', 0.78125),
+     ('embeddings.weight', 0.7572115384615384),
+     ('llama_blocks.llama_0.rms.scale', 0.146484375),
      ('llama_blocks.llama_0.feedforward.1.beta', 0.0),
      ('llama_blocks.llama_1.rms.scale', 0.0),
      ('llama_blocks.llama_1.feedforward.1.beta', 0.0),
@@ -1284,8 +1300,7 @@ show_grads(llama)
      ('llama_blocks.llama_2.feedforward.1.beta', 0.0),
      ('llama_blocks.llama_3.rms.scale', 0.0),
      ('llama_blocks.llama_3.feedforward.1.beta', 0.0),
-     ('ffn.1.beta', 0.0),
-     ('ffn.2.bias', 0.0)]
+     ('ffn.1.beta', 0.0)]
 
 
 
@@ -1419,7 +1434,7 @@ train(llama_with_cosine, llama_optimizer, scheduler=scheduler)
     lr:  [0.00014421629539013508]
     lr:  [0.0001816123615954725]
     lr:  [0.00022255218257041364]
-    validation loss:  4.172841358184814
+    validation loss:  4.179551410675049
 
 
 
@@ -1431,7 +1446,7 @@ train(llama_with_cosine, llama_optimizer, scheduler=scheduler)
 
 
     
-![png](llama_files/llama_75_4.png)
+![png](llama_files/llama_76_4.png)
     
 
 
@@ -1451,73 +1466,73 @@ show_grads(llama_with_cosine, 1e-5)
      ('llama_blocks.llama_2.attention.multihead.out_proj.bias', 100.0),
      ('llama_blocks.llama_3.attention.multihead.in_proj_bias', 100.0),
      ('llama_blocks.llama_3.attention.multihead.out_proj.bias', 100.0),
-     ('llama_blocks.llama_2.attention.w_v.weight', 0.030517578125),
-     ('llama_blocks.llama_0.attention.w_k.weight', 0.0244140625),
+     ('llama_blocks.llama_1.feedforward.1.linear.bias', 0.78125),
+     ('llama_blocks.llama_2.feedforward.1.linear_gate.weight', 0.030517578125),
+     ('llama_blocks.llama_3.attention.w_q.weight', 0.030517578125),
+     ('llama_blocks.llama_0.attention.multihead.out_proj.weight', 0.0244140625),
+     ('llama_blocks.llama_0.feedforward.1.linear_gate.weight', 0.0244140625),
      ('llama_blocks.llama_0.feedforward.1.linear.weight', 0.0244140625),
-     ('llama_blocks.llama_2.attention.multihead.out_proj.weight', 0.0244140625),
+     ('llama_blocks.llama_1.attention.w_v.weight', 0.0244140625),
+     ('llama_blocks.llama_1.feedforward.1.linear.weight', 0.0244140625),
+     ('llama_blocks.llama_2.attention.w_q.weight', 0.0244140625),
+     ('llama_blocks.llama_3.attention.w_v.weight', 0.0244140625),
+     ('llama_blocks.llama_3.attention.multihead.out_proj.weight', 0.0244140625),
+     ('ffn.2.weight', 0.02403846153846154),
      ('llama_blocks.llama_0.attention.w_v.weight', 0.018310546875),
-     ('llama_blocks.llama_2.attention.w_q.weight', 0.018310546875),
-     ('llama_blocks.llama_0.feedforward.0.weight', 0.01220703125),
-     ('llama_blocks.llama_1.attention.w_k.weight', 0.01220703125),
-     ('llama_blocks.llama_1.attention.multihead.out_proj.weight', 0.01220703125),
-     ('llama_blocks.llama_2.feedforward.1.linear.weight', 0.01220703125),
-     ('llama_blocks.llama_3.attention.w_k.weight', 0.01220703125),
-     ('llama_blocks.llama_3.attention.w_v.weight', 0.01220703125),
-     ('ffn.2.weight', 0.01201923076923077),
+     ('llama_blocks.llama_0.feedforward.0.weight', 0.018310546875),
+     ('llama_blocks.llama_1.feedforward.0.weight', 0.018310546875),
+     ('llama_blocks.llama_3.attention.w_k.weight', 0.018310546875),
+     ('llama_blocks.llama_3.feedforward.0.weight', 0.018310546875),
      ('llama_blocks.llama_0.attention.multihead.in_proj_weight',
-      0.010172526041666666),
-     ('llama_blocks.llama_1.attention.multihead.in_proj_weight',
-      0.010172526041666666),
-     ('llama_blocks.llama_2.attention.multihead.in_proj_weight',
-      0.008138020833333334),
+      0.016276041666666668),
+     ('llama_blocks.llama_1.attention.multihead.out_proj.weight', 0.01220703125),
+     ('llama_blocks.llama_1.feedforward.1.linear_gate.weight', 0.01220703125),
+     ('llama_blocks.llama_3.feedforward.1.linear_gate.weight', 0.01220703125),
+     ('llama_blocks.llama_3.feedforward.1.linear.weight', 0.01220703125),
      ('llama_blocks.llama_0.attention.w_q.weight', 0.006103515625),
-     ('llama_blocks.llama_0.feedforward.1.linear_gate.weight', 0.006103515625),
+     ('llama_blocks.llama_0.attention.w_k.weight', 0.006103515625),
      ('llama_blocks.llama_1.attention.w_q.weight', 0.006103515625),
-     ('llama_blocks.llama_1.attention.w_v.weight', 0.006103515625),
-     ('llama_blocks.llama_1.feedforward.0.weight', 0.006103515625),
-     ('llama_blocks.llama_1.feedforward.1.linear_gate.weight', 0.006103515625),
-     ('llama_blocks.llama_2.attention.w_k.weight', 0.006103515625),
-     ('llama_blocks.llama_2.feedforward.1.linear_gate.weight', 0.006103515625),
-     ('llama_blocks.llama_3.attention.multihead.out_proj.weight', 0.006103515625),
-     ('llama_blocks.llama_3.feedforward.0.weight', 0.006103515625),
-     ('llama_blocks.llama_3.feedforward.1.linear_gate.weight', 0.006103515625),
-     ('llama_blocks.llama_3.feedforward.1.linear.weight', 0.006103515625),
-     ('ffn.0.weight', 0.006103515625),
-     ('ffn.1.linear_gate.weight', 0.006103515625),
-     ('ffn.1.linear.weight', 0.006103515625),
+     ('llama_blocks.llama_1.attention.multihead.in_proj_weight', 0.006103515625),
+     ('llama_blocks.llama_2.attention.multihead.in_proj_weight', 0.006103515625),
+     ('llama_blocks.llama_2.attention.multihead.out_proj.weight', 0.006103515625),
+     ('llama_blocks.llama_2.feedforward.1.linear.weight', 0.006103515625),
      ('llama_blocks.llama_3.attention.multihead.in_proj_weight',
       0.004069010416666667),
      ('embeddings.weight', 0.0),
      ('llama_blocks.llama_0.rms.scale', 0.0),
-     ('llama_blocks.llama_0.attention.multihead.out_proj.weight', 0.0),
      ('llama_blocks.llama_0.feedforward.0.bias', 0.0),
      ('llama_blocks.llama_0.feedforward.1.beta', 0.0),
      ('llama_blocks.llama_0.feedforward.1.linear_gate.bias', 0.0),
      ('llama_blocks.llama_0.feedforward.1.linear.bias', 0.0),
      ('llama_blocks.llama_1.rms.scale', 0.0),
+     ('llama_blocks.llama_1.attention.w_k.weight', 0.0),
      ('llama_blocks.llama_1.feedforward.0.bias', 0.0),
      ('llama_blocks.llama_1.feedforward.1.beta', 0.0),
      ('llama_blocks.llama_1.feedforward.1.linear_gate.bias', 0.0),
-     ('llama_blocks.llama_1.feedforward.1.linear.weight', 0.0),
-     ('llama_blocks.llama_1.feedforward.1.linear.bias', 0.0),
      ('llama_blocks.llama_2.rms.scale', 0.0),
+     ('llama_blocks.llama_2.attention.w_k.weight', 0.0),
+     ('llama_blocks.llama_2.attention.w_v.weight', 0.0),
      ('llama_blocks.llama_2.feedforward.0.weight', 0.0),
      ('llama_blocks.llama_2.feedforward.0.bias', 0.0),
      ('llama_blocks.llama_2.feedforward.1.beta', 0.0),
      ('llama_blocks.llama_2.feedforward.1.linear_gate.bias', 0.0),
      ('llama_blocks.llama_2.feedforward.1.linear.bias', 0.0),
      ('llama_blocks.llama_3.rms.scale', 0.0),
-     ('llama_blocks.llama_3.attention.w_q.weight', 0.0),
      ('llama_blocks.llama_3.feedforward.0.bias', 0.0),
      ('llama_blocks.llama_3.feedforward.1.beta', 0.0),
      ('llama_blocks.llama_3.feedforward.1.linear_gate.bias', 0.0),
      ('llama_blocks.llama_3.feedforward.1.linear.bias', 0.0),
+     ('ffn.0.weight', 0.0),
      ('ffn.0.bias', 0.0),
      ('ffn.1.beta', 0.0),
+     ('ffn.1.linear_gate.weight', 0.0),
      ('ffn.1.linear_gate.bias', 0.0),
+     ('ffn.1.linear.weight', 0.0),
      ('ffn.1.linear.bias', 0.0),
      ('ffn.2.bias', 0.0)]
 
 
 
 Even at an extremely low tolerance, the attention biases are not getting any signal. I'm not sure why the learning schedule from the paper doesn't work, but the lesson here is simple: start simple.
+
+
