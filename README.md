@@ -13,7 +13,7 @@ My approach for implementing papers is:
 1. Start by picking apart different components of the paper, and then implementing them one-by-one, training and evaluating as you go.
 
 ## Make sure your layers do what you think.
-1. Use `.shape` religiously.
+1. Use `.shape` religiously. `assert` and `plt.imshow` are also your friends.
 1. Work out the results without matrix multiplication first, and then use the `torch` functions to make it efficient after.
 1. Have a test to see that your layer is right. For example, the RoPE embeddings have a specific property that you can test for. For the Transformer, you can test that the attention is working by looking at the attention map.
 1. Test your layers on various batch, sequence, and embedding sizes. Even if it works for one size, it might not work for others, which will cause problems at inference time.
