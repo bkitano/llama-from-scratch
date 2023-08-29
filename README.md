@@ -126,7 +126,7 @@ def get_batches(data, split, batch_size, context_window, config=MASTER_CONFIG):
     return x, y
 
 MASTER_CONFIG.update({
-    'batch_size': 32,
+    'batch_size': 8,
     'context_window': 16
 })
 
@@ -138,38 +138,14 @@ xs, ys = get_batches(dataset, 'train', MASTER_CONFIG['batch_size'], MASTER_CONFI
 
 
 
-    [('t us sup betimes', ' us sup betimes,'),
-     ('IO:\nRight.\n\nROME', 'O:\nRight.\n\nROMEO'),
-     ('Nurse:\nO, she sa', 'urse:\nO, she say'),
-     (" seem'd to know,", "seem'd to know,\n"),
-     (' let her brother', 'let her brother '),
-     ('ood,\nEven with s', 'od,\nEven with su'),
-     ('en\nWhisper the s', 'n\nWhisper the sp'),
-     (', fly! for all y', ' fly! for all yo'),
-     (" Saint Peter's C", "Saint Peter's Ch"),
-     (', but that\nWhich', ' but that\nWhich '),
-     ('uld as willingly', 'ld as willingly '),
-     ('y brother,\nIs pr', ' brother,\nIs pri'),
-     (' you ready your ', 'you ready your s'),
-     ('rth the audience', 'th the audience '),
-     ('\n\nQUEEN ELIZABET', '\nQUEEN ELIZABETH'),
-     ('ection,\nwhich ca', 'ction,\nwhich can'),
-     ('is wisdom hastes', 's wisdom hastes '),
-     (' and quinces in ', 'and quinces in t'),
-     ('nt death.\n\nSICIN', 't death.\n\nSICINI'),
-     ("y she's mad.\n\nBR", " she's mad.\n\nBRU"),
-     ('eware of him;\nSi', 'ware of him;\nSin'),
-     ('s\nAnd make pursu', '\nAnd make pursui'),
-     ('r and be slain; ', ' and be slain; n'),
-     (' I, with grief a', 'I, with grief an'),
-     ('?\n\nSecond Keeper', '\n\nSecond Keeper:'),
-     ('\nNow, Thomas Mow', 'Now, Thomas Mowb'),
-     ('or this once, ye', 'r this once, yea'),
-     ("l 'tis just.\n\nLU", " 'tis just.\n\nLUC"),
-     ('es like a lamb. ', 's like a lamb. Y'),
-     ('t night, I warra', ' night, I warran'),
-     ('y tears would wa', ' tears would was'),
-     ('\n\nANGELO:\nWell, ', '\nANGELO:\nWell, l')]
+    [('atience.\n\nKING R', 'tience.\n\nKING RI'),
+     ('ithin their inno', 'thin their innoc'),
+     ('er you.\nYour lov', 'r you.\nYour love'),
+     ('\nCOMINIUS:\nLet m', 'COMINIUS:\nLet me'),
+     ('and bear-baiting', 'nd bear-baitings'),
+     ('leaves the stage', 'eaves the stage,'),
+     ('nfess are full o', 'fess are full of'),
+     ('n for their sons', ' for their sons,')]
 
 
 
@@ -252,7 +228,8 @@ Alright, let's train our `SimpleBrokenModel` to make sure gradients flow. After 
 ```python
 MASTER_CONFIG.update({
     'epochs': 1000,
-    'log_interval': 10 
+    'log_interval': 10,
+    'batch_size': 32,
 })
 model = SimpleBrokenModel(MASTER_CONFIG)
 
@@ -292,7 +269,7 @@ train(model, optimizer)
 ```
 
     model params: 33217
-    validation loss:  3.9457355260849
+    validation loss:  3.940607500076294
 
 
 
@@ -360,7 +337,7 @@ train(model, optimizer)
 ```
 
     model params: 33217
-    validation loss:  2.5113263607025145
+    validation loss:  2.5350086212158205
 
 
 
@@ -401,11 +378,11 @@ generate(model)
 
 
 
-    ['\nWI in\nThed grtend\nA yod ys wit',
-     '\nY aroticunutser\nE oy mendomed ',
-     "\n\nRIf t fan f ses, k be wn'd mo",
-     '\nRu hiseedst den t wat onderyou',
-     "\nARaceps hond wr f\nI' fu kn be "]
+    ['\nHeerory RD: wofousormavedge t,',
+     '\nS:\n\n\nC:\nWhofowerathsoou-hals\n\n',
+     '\nThince cofopl wo IRCERTheethea',
+     '\nSS:\nAs oo be aveckid hince.\nD ',
+     '\nHAbet tthurul mewaid fo t BULU']
 
 
 
@@ -513,7 +490,7 @@ train(model, optimizer)
 ```
 
     model params: 35265
-    validation loss:  2.4792869329452514
+    validation loss:  2.5192972898483275
 
 
 
@@ -537,16 +514,16 @@ So RMSNorm works, and it got our loss down by a small amount.
 
 ```python
 def get_rotary_matrix(context_window, embedding_dim):
-        R = torch.zeros((context_window, embedding_dim, embedding_dim), requires_grad=False)
-        for position in range(context_window):
-            for i in range(embedding_dim//2):
-                theta = 10000. ** (-2.*(i - 1) / embedding_dim)
-                m_theta = position * theta
-                R[position, 2*i,2*i] = np.cos(m_theta)
-                R[position, 2*i,2*i+1] = - np.sin(m_theta)
-                R[position, 2*i+1,2*i] = np.sin(m_theta)
-                R[position, 2*i+1,2*i+1] = np.cos(m_theta)
-        return R
+    R = torch.zeros((context_window, embedding_dim, embedding_dim), requires_grad=False)
+    for position in range(context_window):
+        for i in range(embedding_dim//2):
+            theta = 10000. ** (-2.*(i - 1) / embedding_dim)
+            m_theta = position * theta
+            R[position, 2*i,2*i] = np.cos(m_theta)
+            R[position, 2*i,2*i+1] = - np.sin(m_theta)
+            R[position, 2*i+1,2*i] = np.sin(m_theta)
+            R[position, 2*i+1,2*i+1] = np.cos(m_theta)
+    return R
 ```
 
 
@@ -610,7 +587,7 @@ config = {
     'context_window': 16,
 }
 
-class RoPEAttention(nn.Module):
+class RoPEAttentionHead(nn.Module):
     def __init__(self, config):
         super().__init__()
         self.config = config
@@ -618,7 +595,6 @@ class RoPEAttention(nn.Module):
         self.w_k = nn.Linear(config['d_model'], config['d_model'], bias=False)
         self.w_v = nn.Linear(config['d_model'], config['d_model'], bias=False)
 
-        self.multihead = nn.MultiheadAttention(config['d_model'], config['n_heads'], dropout=0.1, batch_first=True)
         self.R = get_rotary_matrix(config['context_window'], config['d_model'])
 
     def get_rotary_matrix(context_window, embedding_dim):
@@ -640,19 +616,20 @@ class RoPEAttention(nn.Module):
         k = self.w_k(x)
         v = self.w_v(x)
 
-        q_out = (torch.bmm(q.transpose(0,1), self.R)).transpose(0,1)
-        k_out = (torch.bmm(k.transpose(0,1), self.R)).transpose(0,1)
-        v_out = (torch.bmm(v.transpose(0,1), self.R)).transpose(0,1)
+        q_rotated = (torch.bmm(q.transpose(0,1), self.R[:m])).transpose(0,1)
+        k_rotated = (torch.bmm(k.transpose(0,1), self.R[:m])).transpose(0,1)
 
-        activations, attn_weights = self.multihead(
-            q_out,k_out,v_out, 
+        activations = F.scaled_dot_product_attention(
+            q_rotated,k_rotated,v,dropout_p =.1
         )
 
         if return_attn_weights:
+            attn_weights = torch.bmm(q_rotated, k_rotated.transpose(1,2)) / np.sqrt(d)
+            attn_weights = F.softmax(attn_weights, dim=-1)
             return activations, attn_weights
         return activations
 
-layer = RoPEAttention(config)
+layer = RoPEAttentionHead(config)
 batch = torch.randn((config['batch_size'], config['context_window'], config['d_model']))
 output, attn_weights = layer(batch, return_attn_weights=True)
 ```
@@ -682,13 +659,13 @@ for position in range(config['context_window']):
     k_rotated[:,position,:] = torch.matmul(k[:,position,:], layer.R[position,:,:])
     v_rotated[:,position,:] = torch.matmul(v[:,position,:], layer.R[position,:,:])
 
-q_out = (torch.bmm(q.transpose(0,1), layer.R)).transpose(0,1)
-k_out = (torch.bmm(k.transpose(0,1), layer.R)).transpose(0,1)
+q_rotated = (torch.bmm(q.transpose(0,1), layer.R)).transpose(0,1)
+k_rotated = (torch.bmm(k.transpose(0,1), layer.R)).transpose(0,1)
 v_out = (torch.bmm(v.transpose(0,1), layer.R)).transpose(0,1)
 
 assert torch.allclose(q.transpose(0,1)[0], q[:,0,:])
 assert torch.allclose(q.transpose(0,1)[0] @ layer.R[0], q[:,0,:] @ layer.R[0])
-assert torch.allclose(q_rotated, q_out)
+assert torch.allclose(q_rotated, q_rotated)
 ```
 
 
@@ -700,7 +677,7 @@ config = {
     'context_window': 3,
 }
 
-layer = RoPEAttention(config)
+layer = RoPEAttentionHead(config)
 batch = torch.ones((config['batch_size'], config['context_window'], config['d_model']))
 output, attn_weights = layer(batch, return_attn_weights=True)
 
@@ -723,115 +700,46 @@ assert torch.allclose(q @ k, x_k.T @ layer.w_k.weight.T @ layer.R[n, :, :].T @ l
 assert torch.allclose(q @ k, x_k.T @ layer.w_k.weight.T @ layer.R[n-m, :, :].T @ layer.w_q.weight @ x_q)
 ```
 
-    /var/folders/w4/2j887mvs097bkhhjpgfzjlyr0000gn/T/ipykernel_17478/2550954139.py:26: UserWarning: The use of `x.T` on tensors of dimension other than 2 to reverse their shape is deprecated and it will throw an error in a future release. Consider `x.mT` to transpose batches of matrices or `x.permute(*torch.arange(x.ndim - 1, -1, -1))` to reverse the dimensions of a tensor. (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/aten/src/ATen/native/TensorShape.cpp:3575.)
-      assert q.T @ k == q @ k # transpose is redundant
+    torch.Size([1, 3, 2]) torch.Size([1, 3, 2])
 
 
-Now let's inspect the attention weights. Since this is causal, we would expect that due to masking, the upper triangular of the attention should be 0.
-
-
-```python
-MASTER_CONFIG.update({
-    'n_heads': 8,
-})
-layer = RoPEAttention(MASTER_CONFIG)
-batch = torch.ones((MASTER_CONFIG['batch_size'], MASTER_CONFIG['context_window'], MASTER_CONFIG['d_model']))
-output, attn_weights = layer(batch, return_attn_weights=True)
-
-plt.imshow(attn_weights[0].detach().numpy(), interpolation='nearest')
-plt.colorbar()
-```
-
-
-
-
-    <matplotlib.colorbar.Colorbar at 0x16c039090>
-
-
-
-
-    
-![png](llama_files/llama_48_1.png)
-    
-
-
-This is not good; it means that information is leaking across the attention. We need to ensure the causal mask is working.
+Let's setup a multi-headed attention layer for this singular attention head and see what happens when we train.
 
 
 ```python
-class RoPEAttention_wMask(nn.Module):
+# definitely there's an optimization we could make where we cache the rotation matrices, but skip.
+class RoPEMultiheadAttention(nn.Module):
     def __init__(self, config):
         super().__init__()
         self.config = config
-        self.w_q = nn.Linear(config['d_model'], config['d_model'], bias=False)
-        self.w_k = nn.Linear(config['d_model'], config['d_model'], bias=False)
-        self.w_v = nn.Linear(config['d_model'], config['d_model'], bias=False)
+        self.heads = nn.ModuleList([
+            RoPEAttentionHead(config) for _ in range(config['n_heads'])
+        ])
+        self.linear = nn.Linear(config['n_heads'] * config['d_model'], config['d_model'])
+        self.dropout = nn.Dropout(.1)
 
-        self.multihead = nn.MultiheadAttention(config['d_model'], config['n_heads'], dropout=0.1, batch_first=True)
-        self.R = get_rotary_matrix(config['context_window'], config['d_model'])
-
-    def get_rotary_matrix(context_window, embedding_dim):
-        R = torch.zeros((context_window, embedding_dim, embedding_dim), requires_grad=False)
-        for position in range(context_window):
-            for i in range(embedding_dim//2):
-                theta = 10000. ** (-2.*(i - 1) / embedding_dim)
-                m_theta = position * theta
-                R[position, 2*i,2*i] = np.cos(m_theta)
-                R[position, 2*i,2*i+1] = - np.sin(m_theta)
-                R[position, 2*i+1,2*i] = np.sin(m_theta)
-                R[position, 2*i+1,2*i+1] = np.cos(m_theta)
-        return R
+    def forward(self, x):
+        heads = [h(x) for h in self.heads]
+        x = torch.cat(heads, dim=-1)
+        x = self.linear(x)
+        x = self.dropout(x)
+        return x
     
-    def forward(self, x, return_attn_weights=False):
-        b,m,d = x.shape
-        
-        q = self.w_q(x)
-        k = self.w_k(x)
-        v = self.w_v(x)
-
-        q_out = (torch.bmm(q.transpose(0,1), self.R[:m, ...])).transpose(0,1)
-        k_out = (torch.bmm(k.transpose(0,1), self.R[:m, ...])).transpose(0,1)
-        v_out = (torch.bmm(v.transpose(0,1), self.R[:m, ...])).transpose(0,1)
-
-        activations, attn_weights = self.multihead(
-            q_out,k_out,v_out, 
-            attn_mask=nn.Transformer.generate_square_subsequent_mask(m),
-            is_causal=True
-        )
-
-        if return_attn_weights:
-            return activations, attn_weights
-        return activations
-
-layer = RoPEAttention(config)
-batch = torch.randn((config['batch_size'], config['context_window'], config['d_model']))
-output, attn_weights = layer(batch, return_attn_weights=True)
-```
-
-
-```python
-layer = RoPEAttention_wMask(MASTER_CONFIG)
+MASTER_CONFIG.update({
+    'n_heads': 8,
+})
+layer = RoPEMultiheadAttention(MASTER_CONFIG)
 batch = torch.ones((MASTER_CONFIG['batch_size'], MASTER_CONFIG['context_window'], MASTER_CONFIG['d_model']))
-output, attn_weights = layer(batch, return_attn_weights=True)
-
-plt.imshow(attn_weights[0].detach().numpy())
-plt.colorbar()
+output = layer(batch)
+output.shape
 ```
 
 
 
 
-    <matplotlib.colorbar.Colorbar at 0x16c2c7b50>
+    torch.Size([32, 16, 128])
 
 
-
-
-    
-![png](llama_files/llama_51_1.png)
-    
-
-
-Alright, let's run it and see what happens.
 
 
 ```python
@@ -842,7 +750,7 @@ class RopeModel(nn.Module):
 
         self.embedding = nn.Embedding(config['vocab_size'], config['d_model'])
         self.rms = RMSNorm((config['context_window'], config['d_model']))
-        self.rope_attention = RoPEAttention_wMask(config)
+        self.rope_attention = RoPEMultiheadAttention(config)
 
         self.linear = nn.Sequential(
             nn.Linear(config['d_model'], config['d_model']),
@@ -880,8 +788,8 @@ optimizer = torch.optim.Adam(model.parameters())
 train(model, optimizer)
 ```
 
-    model params: 150465
-    validation loss:  2.1157416343688964
+    model params: 559681
+    validation loss:  2.11402370929718
 
 
 
@@ -893,11 +801,241 @@ train(model, optimizer)
 
 
     
-![png](llama_files/llama_53_2.png)
+![png](llama_files/llama_49_2.png)
     
 
 
-It looks like we can drive our loss down even lower. Let's do that by updating master config.
+Wow, would you look at that, our validation loss is down to .16. That is so low...it's almost too low. Consider the check we used from above: $\exp(.16) = 1.17$, so it's as if the model is choosing basically next character correctly every time. Let's see what happens when we generate.
+
+
+```python
+generate(model, config=MASTER_CONFIG)
+```
+
+
+
+
+    ['\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n',
+     '\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n',
+     '\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n',
+     '\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n',
+     '\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n']
+
+
+
+So it looks terrible. What is happening here? Let's start debugging this by looking at the attention.
+
+
+```python
+MASTER_CONFIG.update({
+    'n_heads': 8,
+})
+layer = RoPEAttentionHead(MASTER_CONFIG)
+batch = torch.ones((MASTER_CONFIG['batch_size'], MASTER_CONFIG['context_window'], MASTER_CONFIG['d_model']))
+output, attn_weights = layer(batch, return_attn_weights=True)
+
+plt.imshow(attn_weights[0].detach().numpy(), interpolation='nearest')
+plt.colorbar()
+```
+
+
+
+
+    <matplotlib.colorbar.Colorbar at 0x2a0ac4b90>
+
+
+
+
+    
+![png](llama_files/llama_53_1.png)
+    
+
+
+So here we see that all the attention is lit up, meaning that characters in any position are attending to characters in any other position. What's bad about this? We are trying to predict the next token *solely* on the tokens that came before it, but here we're seeing that the model is attending to tokens that come after it. In other words, the model is cheating, or leaking information from the future. This is a problem, and it's why we need to use a causal mask.
+
+
+```python
+config = {
+    'batch_size': 10,
+    'd_model': 512,
+    'n_heads': 8,
+    'context_window': 16,
+}
+
+class RoPEMaskedAttentionHead(nn.Module):
+    def __init__(self, config):
+        super().__init__()
+        self.config = config
+        self.w_q = nn.Linear(config['d_model'], config['d_model'], bias=False)
+        self.w_k = nn.Linear(config['d_model'], config['d_model'], bias=False)
+        self.w_v = nn.Linear(config['d_model'], config['d_model'], bias=False)
+
+        self.R = get_rotary_matrix(config['context_window'], config['d_model'])
+
+    def get_rotary_matrix(context_window, embedding_dim):
+        R = torch.zeros((context_window, embedding_dim, embedding_dim), requires_grad=False)
+        for position in range(context_window):
+            for i in range(embedding_dim//2):
+                theta = 10000. ** (-2.*(i - 1) / embedding_dim)
+                m_theta = position * theta
+                R[position, 2*i,2*i] = np.cos(m_theta)
+                R[position, 2*i,2*i+1] = - np.sin(m_theta)
+                R[position, 2*i+1,2*i] = np.sin(m_theta)
+                R[position, 2*i+1,2*i+1] = np.cos(m_theta)
+        return R
+    
+    def forward(self, x, return_attn_weights=False):
+        b,m,d = x.shape
+        
+        q = self.w_q(x)
+        k = self.w_k(x)
+        v = self.w_v(x)
+
+        q_rotated = (torch.bmm(q.transpose(0,1), self.R[:m])).transpose(0,1)
+        k_rotated = (torch.bmm(k.transpose(0,1), self.R[:m])).transpose(0,1)
+
+        activations = F.scaled_dot_product_attention(
+            q_rotated,k_rotated,v,dropout_p =.1, is_causal=True
+        )
+
+        if return_attn_weights:
+            attn_mask = torch.tril(torch.ones((m,m)), diagonal=0)
+            attn_weights = torch.bmm(q_rotated, k_rotated.transpose(1,2)) / np.sqrt(d) + attn_mask
+            attn_weights = F.softmax(attn_weights, dim=-1)
+            return activations, attn_weights
+        return activations
+
+layer = RoPEMaskedAttentionHead(config)
+batch = torch.randn((config['batch_size'], config['context_window'], config['d_model']))
+output, attn_weights = layer(batch, return_attn_weights=True)
+```
+
+
+```python
+layer = RoPEMaskedAttentionHead(MASTER_CONFIG)
+batch = torch.ones((MASTER_CONFIG['batch_size'], MASTER_CONFIG['context_window'], MASTER_CONFIG['d_model']))
+output, attn_weights = layer(batch, return_attn_weights=True)
+
+plt.imshow(attn_weights[0].detach().numpy())
+plt.colorbar()
+```
+
+
+
+
+    <matplotlib.colorbar.Colorbar at 0x2a09acb90>
+
+
+
+
+    
+![png](llama_files/llama_56_1.png)
+    
+
+
+Now, we can see that the upper triangular of our attention activations (the part that corresponds to the future) is zeroed out. Let's see what happens when we train.
+
+
+```python
+# definitely there's an optimization we could make where we cache the rotation matrices, but skip.
+class RoPEMaskedMultiheadAttention(nn.Module):
+    def __init__(self, config):
+        super().__init__()
+        self.config = config
+        self.heads = nn.ModuleList([
+            RoPEMaskedAttentionHead(config) for _ in range(config['n_heads'])
+        ])
+        self.linear = nn.Linear(config['n_heads'] * config['d_model'], config['d_model'])
+        self.dropout = nn.Dropout(.1)
+
+    def forward(self, x):
+        heads = [h(x) for h in self.heads]
+        x = torch.cat(heads, dim=-1)
+        x = self.linear(x)
+        x = self.dropout(x)
+        return x
+    
+MASTER_CONFIG.update({
+    'n_heads': 8,
+})
+layer = RoPEMultiheadAttention(MASTER_CONFIG)
+batch = torch.ones((MASTER_CONFIG['batch_size'], MASTER_CONFIG['context_window'], MASTER_CONFIG['d_model']))
+output = layer(batch)
+output.shape
+```
+
+
+
+
+    torch.Size([32, 16, 128])
+
+
+
+
+```python
+class RopeModel(nn.Module):
+    def __init__(self, config):
+        super().__init__()
+        self.config = config
+
+        self.embedding = nn.Embedding(config['vocab_size'], config['d_model'])
+        self.rms = RMSNorm((config['context_window'], config['d_model']))
+        self.rope_attention = RoPEMaskedMultiheadAttention(config)
+
+        self.linear = nn.Sequential(
+            nn.Linear(config['d_model'], config['d_model']),
+            nn.ReLU(),
+        )
+
+        self.last_linear = nn.Linear(config['d_model'], config['vocab_size'])
+        
+        print("model params:", sum([m.numel() for m in self.parameters()]))
+
+    def forward(self, idx, targets=None):
+        x = self.embedding(idx)
+        
+        # one block of attention
+        x = self.rms(x) # rms pre-normalization
+        x = x + self.rope_attention(x)
+
+        x = self.rms(x) # rms pre-normalization
+        x = x + self.linear(x)
+
+        logits = self.last_linear(x)
+
+        if targets is not None:
+            loss = F.cross_entropy(logits.view(-1, self.config['vocab_size']), targets.view(-1))
+            return logits, loss
+
+        else:
+            return logits
+
+model = RopeModel(MASTER_CONFIG)
+xs, ys = get_batches(dataset, 'train', MASTER_CONFIG['batch_size'], MASTER_CONFIG['context_window'])
+
+logits, loss = model(xs, ys)
+optimizer = torch.optim.Adam(model.parameters())
+train(model, optimizer)
+```
+
+    model params: 559681
+    validation loss:  2.131099271774292
+
+
+
+
+
+    <Axes: >
+
+
+
+
+    
+![png](llama_files/llama_59_2.png)
+    
+
+
+Much better, our loss is now not merely dropping to near-zero. It looks like we can drive our loss down even lower. Let's do that by updating master config.
 
 
 ```python
@@ -908,7 +1046,7 @@ MASTER_CONFIG.update({
 train(model, optimizer)
 ```
 
-    validation loss:  1.9027801871299743
+    validation loss:  1.9654677629470825
 
 
 
@@ -920,7 +1058,7 @@ train(model, optimizer)
 
 
     
-![png](llama_files/llama_55_2.png)
+![png](llama_files/llama_61_2.png)
     
 
 
@@ -1019,7 +1157,7 @@ train(model, optimizer)
 
 
     
-![png](llama_files/llama_58_2.png)
+![png](llama_files/llama_64_2.png)
     
 
 
@@ -1110,7 +1248,7 @@ train(llama, optimizer, config=MASTER_CONFIG)
 
 
     
-![png](llama_files/llama_62_2.png)
+![png](llama_files/llama_68_2.png)
     
 
 
@@ -1136,7 +1274,7 @@ train(llama, optimizer, scheduler=None, config=MASTER_CONFIG)
 
 
     
-![png](llama_files/llama_64_2.png)
+![png](llama_files/llama_70_2.png)
     
 
 
@@ -1159,7 +1297,7 @@ train(llama, optimizer, config=MASTER_CONFIG)
 
 
     
-![png](llama_files/llama_66_2.png)
+![png](llama_files/llama_72_2.png)
     
 
 
@@ -1446,7 +1584,7 @@ train(llama_with_cosine, llama_optimizer, scheduler=scheduler)
 
 
     
-![png](llama_files/llama_76_4.png)
+![png](llama_files/llama_82_4.png)
     
 
 
