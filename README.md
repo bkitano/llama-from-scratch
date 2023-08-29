@@ -4,6 +4,25 @@ I want to provide some tips from my experience implementing a paper. I'm going t
 
 I'm only going to *loosely* follow the layout of their paper; while the formatting and order of sections makes sense for publication, we're going to be implementing the paper. I'll also be skipping over some of the more obvious steps, like setting up a virtual environment and installing dependencies.
 
+A preview of what we're going to end up with:
+    
+```python
+
+print(generate(llama, MASTER_CONFIG, 500)[0])
+
+ZELBETH:
+Sey solmenter! 'tis tonguerered if berryishdd, and What his stabe, you, and, but all I pilJefals, mode with,
+Vurint as steolated have loven OlD the queen'd refore
+Are been, good plmp:
+
+Proforne, wift'es swleen, was no bunderes'd a a quain beath!
+Tybell is my gateer stalk smen'd as be matious dazest brink thou
+lord
+Enves were cIUll, afe and whwas seath This a is, an tale hoice his his onety Meall-tearn not murkawn, fase bettizen'd her,
+To belacquesterer? baxewed wupl usweggs yet tall
+An
+```
+
 # Takeaways
 
 ## Always work iteratively: start small, stay certain, and build up.
@@ -138,14 +157,14 @@ xs, ys = get_batches(dataset, 'train', MASTER_CONFIG['batch_size'], MASTER_CONFI
 
 
 
-    [('atience.\n\nKING R', 'tience.\n\nKING RI'),
-     ('ithin their inno', 'thin their innoc'),
-     ('er you.\nYour lov', 'r you.\nYour love'),
-     ('\nCOMINIUS:\nLet m', 'COMINIUS:\nLet me'),
-     ('and bear-baiting', 'nd bear-baitings'),
-     ('leaves the stage', 'eaves the stage,'),
-     ('nfess are full o', 'fess are full of'),
-     ('n for their sons', ' for their sons,')]
+    [(', or banishment,', ' or banishment, '),
+     ('do what hands do', 'o what hands do;'),
+     ("? If thou'lt see", " If thou'lt see "),
+     ('and could put br', 'nd could put bre'),
+     ("hath deliver'd.\n", "ath deliver'd.\nI"),
+     ('ing by: whereof ', 'ng by: whereof I'),
+     (' blows! Despisin', 'blows! Despising'),
+     ('ng of blood, who', 'g of blood, whos')]
 
 
 
@@ -269,7 +288,7 @@ train(model, optimizer)
 ```
 
     model params: 33217
-    validation loss:  3.940607500076294
+    validation loss:  3.942167806625366
 
 
 
@@ -281,7 +300,7 @@ train(model, optimizer)
 
 
     
-![png](llama_files/llama_22_2.png)
+![png](llama_files/llama_23_2.png)
     
 
 
@@ -337,7 +356,7 @@ train(model, optimizer)
 ```
 
     model params: 33217
-    validation loss:  2.5350086212158205
+    validation loss:  2.5058052778244018
 
 
 
@@ -349,7 +368,7 @@ train(model, optimizer)
 
 
     
-![png](llama_files/llama_24_2.png)
+![png](llama_files/llama_25_2.png)
     
 
 
@@ -378,11 +397,11 @@ generate(model)
 
 
 
-    ['\nHeerory RD: wofousormavedge t,',
-     '\nS:\n\n\nC:\nWhofowerathsoou-hals\n\n',
-     '\nThince cofopl wo IRCERTheethea',
-     '\nSS:\nAs oo be aveckid hince.\nD ',
-     '\nHAbet tthurul mewaid fo t BULU']
+    ['\nFind!\nD:\nAr t,\nLis sthte o t l',
+     '\nAnd ronnot ar\nBE:\nKINRDYOrspr;',
+     '\nI t athe momyengthend thanswal',
+     '\nFis t bp he\nLacarn.\nA:\nYOMI wi',
+     '\nWh ly sck\nB-de pll t\nHERIns ou']
 
 
 
@@ -490,7 +509,7 @@ train(model, optimizer)
 ```
 
     model params: 35265
-    validation loss:  2.5192972898483275
+    validation loss:  2.5015316724777223
 
 
 
@@ -502,7 +521,7 @@ train(model, optimizer)
 
 
     
-![png](llama_files/llama_34_2.png)
+![png](llama_files/llama_35_2.png)
     
 
 
@@ -547,7 +566,7 @@ for i in range(K):
 
 
     
-![png](llama_files/llama_38_0.png)
+![png](llama_files/llama_39_0.png)
     
 
 
@@ -700,7 +719,8 @@ assert torch.allclose(q @ k, x_k.T @ layer.w_k.weight.T @ layer.R[n, :, :].T @ l
 assert torch.allclose(q @ k, x_k.T @ layer.w_k.weight.T @ layer.R[n-m, :, :].T @ layer.w_q.weight @ x_q)
 ```
 
-    torch.Size([1, 3, 2]) torch.Size([1, 3, 2])
+    /var/folders/w4/2j887mvs097bkhhjpgfzjlyr0000gn/T/ipykernel_52564/2062321511.py:26: UserWarning: The use of `x.T` on tensors of dimension other than 2 to reverse their shape is deprecated and it will throw an error in a future release. Consider `x.mT` to transpose batches of matrices or `x.permute(*torch.arange(x.ndim - 1, -1, -1))` to reverse the dimensions of a tensor. (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/aten/src/ATen/native/TensorShape.cpp:3575.)
+      assert q.T @ k == q @ k # transpose is redundant
 
 
 Let's setup a multi-headed attention layer for this singular attention head and see what happens when we train.
@@ -789,7 +809,7 @@ train(model, optimizer)
 ```
 
     model params: 559681
-    validation loss:  2.11402370929718
+    validation loss:  0.1623048834502697
 
 
 
@@ -801,7 +821,7 @@ train(model, optimizer)
 
 
     
-![png](llama_files/llama_49_2.png)
+![png](llama_files/llama_50_2.png)
     
 
 
@@ -815,10 +835,10 @@ generate(model, config=MASTER_CONFIG)
 
 
 
-    ['\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n',
+    ['\n\n\n\n\n\n\n\nI\n\nOOOOOOOOOFOOtOOOOOOO',
+     '\nIIIIII IIIIIIIIIIIIIIIIIIIIIII',
      '\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n',
-     '\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n',
-     '\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n',
+     '\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\naaame',
      '\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n']
 
 
@@ -841,13 +861,13 @@ plt.colorbar()
 
 
 
-    <matplotlib.colorbar.Colorbar at 0x2a0ac4b90>
+    <matplotlib.colorbar.Colorbar at 0x2872d0c10>
 
 
 
 
     
-![png](llama_files/llama_53_1.png)
+![png](llama_files/llama_54_1.png)
     
 
 
@@ -923,17 +943,17 @@ plt.colorbar()
 
 
 
-    <matplotlib.colorbar.Colorbar at 0x2a09acb90>
+    <matplotlib.colorbar.Colorbar at 0x2873f30d0>
 
 
 
 
     
-![png](llama_files/llama_56_1.png)
+![png](llama_files/llama_57_1.png)
     
 
 
-Now, we can see that the upper triangular of our attention activations (the part that corresponds to the future) is zeroed out. Let's see what happens when we train.
+Now, we can see that the upper triangular of our attention activations (the part that corresponds to the future) is nearly zeroed out. Let's see what happens when we train.
 
 
 ```python
@@ -1019,7 +1039,7 @@ train(model, optimizer)
 ```
 
     model params: 559681
-    validation loss:  2.131099271774292
+    validation loss:  2.0815173864364622
 
 
 
@@ -1031,7 +1051,7 @@ train(model, optimizer)
 
 
     
-![png](llama_files/llama_59_2.png)
+![png](llama_files/llama_60_2.png)
     
 
 
@@ -1046,7 +1066,7 @@ MASTER_CONFIG.update({
 train(model, optimizer)
 ```
 
-    validation loss:  1.9654677629470825
+    validation loss:  1.8985356330871581
 
 
 
@@ -1058,7 +1078,7 @@ train(model, optimizer)
 
 
     
-![png](llama_files/llama_61_2.png)
+![png](llama_files/llama_62_2.png)
     
 
 
@@ -1106,7 +1126,7 @@ class RopeModel(nn.Module):
 
         self.embedding = nn.Embedding(config['vocab_size'], config['d_model'])
         self.rms = RMSNorm((config['context_window'], config['d_model']))
-        self.rope_attention = RoPEAttention_wMask(config)
+        self.rope_attention = RoPEMaskedMultiheadAttention(config)
 
         self.linear = nn.Sequential(
             nn.Linear(config['d_model'], config['d_model']),
@@ -1144,8 +1164,8 @@ optimizer = torch.optim.Adam(model.parameters())
 train(model, optimizer)
 ```
 
-    model params: 183490
-    validation loss:  1.8666490197181702
+    model params: 592706
+    validation loss:  1.8963455319404603
 
 
 
@@ -1157,7 +1177,7 @@ train(model, optimizer)
 
 
     
-![png](llama_files/llama_64_2.png)
+![png](llama_files/llama_65_2.png)
     
 
 
@@ -1173,7 +1193,7 @@ class LlamaBlock(nn.Module):
 
         self.rms = RMSNorm((config['context_window'], config['d_model']))
         
-        self.attention = RoPEAttention_wMask(config)
+        self.attention = RoPEMaskedMultiheadAttention(config)
         self.feedforward = nn.Sequential(
             nn.Linear(config['d_model'], config['d_model']),
             SwiGLU(config['d_model']),
@@ -1235,8 +1255,8 @@ optimizer = torch.optim.Adam(llama.parameters())
 train(llama, optimizer, config=MASTER_CONFIG)
 ```
 
-    model params: 733382
-    validation loss:  1.616115140914917
+    model params: 2370246
+    validation loss:  1.5532499313354493
 
 
 
@@ -1248,7 +1268,7 @@ train(llama, optimizer, config=MASTER_CONFIG)
 
 
     
-![png](llama_files/llama_68_2.png)
+![png](llama_files/llama_69_2.png)
     
 
 
@@ -1262,7 +1282,7 @@ MASTER_CONFIG.update({
 train(llama, optimizer, scheduler=None, config=MASTER_CONFIG)
 ```
 
-    validation loss:  0.9024032115936279
+    validation loss:  1.1478946447372436
 
 
 
@@ -1274,7 +1294,7 @@ train(llama, optimizer, scheduler=None, config=MASTER_CONFIG)
 
 
     
-![png](llama_files/llama_70_2.png)
+![png](llama_files/llama_71_2.png)
     
 
 
@@ -1285,7 +1305,7 @@ It seems we can go even lower, still without serious overfitting. Either there i
 train(llama, optimizer, config=MASTER_CONFIG)
 ```
 
-    validation loss:  0.746810007095337
+    validation loss:  0.9996801257133484
 
 
 
@@ -1297,7 +1317,7 @@ train(llama, optimizer, config=MASTER_CONFIG)
 
 
     
-![png](llama_files/llama_72_2.png)
+![png](llama_files/llama_73_2.png)
     
 
 
@@ -1307,32 +1327,18 @@ print(generate(llama, MASTER_CONFIG, 500)[0])
 ```
 
     
-    Evend her break of thou thire xoing dieble had side, did foesors exenatedH in siffied up,
-    No, none,
-    And you ling as thought depond.
     
-    MENENIUS:
-    Tell officien:
-    To pesiding be
-    Best wanty and to spiege,
-    To uncine shee patss again,
-    I will hen: then they
-    Moieth:
-    I my cast in letch:
-    For bereful, give toan I may
+    ZELBETH:
+    Sey solmenter! 'tis tonguerered if berryishdd, and What his stabe, you, and, but all I pilJefals, mode with,
+    Vurint as steolated have loven OlD the queen'd refore
+    Are been, good plmp:
     
-    LINT OF AUMERLE:
-    Out, or me but thee here sir,
-    Why first with canse pring;
-    Now!
-    
-    Gide me couuse
-    The haster:
-    And suilt harming,
-    Then as pereise with and go.
-    
-    FROMNIUS:
-    I well? speak and wieke ac
+    Proforne, wift'es swleen, was no bunderes'd a a quain beath!
+    Tybell is my gateer stalk smen'd as be matious dazest brink thou
+    lord
+    Enves were cIUll, afe and whwas seath This a is, an tale hoice his his onety Meall-tearn not murkawn, fase bettizen'd her,
+    To belacquesterer? baxewed wupl usweggs yet tall
+    An
 
 
 At this point, we've hit the bottom with our training. Let's test on the test set.
@@ -1346,7 +1352,7 @@ logits, loss = llama(xs, ys)
 print(loss)
 ```
 
-    tensor(0.8304, grad_fn=<NllLossBackward0>)
+    tensor(1.2358, grad_fn=<NllLossBackward0>)
 
 
 # Miscellaneous
@@ -1363,84 +1369,6 @@ def show_grads(model, tol=1e-2):
 
 show_grads(llama)
 ```
-
-
-
-
-    [('llama_blocks.llama_0.attention.multihead.in_proj_bias', 36.71875),
-     ('llama_blocks.llama_3.attention.multihead.in_proj_bias', 35.9375),
-     ('llama_blocks.llama_1.attention.multihead.in_proj_bias', 33.59375),
-     ('llama_blocks.llama_2.attention.multihead.in_proj_bias', 33.333333333333336),
-     ('llama_blocks.llama_0.attention.multihead.in_proj_weight',
-      21.840413411458332),
-     ('llama_blocks.llama_0.attention.w_q.weight', 14.892578125),
-     ('llama_blocks.llama_0.attention.multihead.out_proj.weight', 13.4765625),
-     ('llama_blocks.llama_0.attention.w_k.weight', 12.9638671875),
-     ('llama_blocks.llama_0.attention.w_v.weight', 11.8896484375),
-     ('llama_blocks.llama_1.attention.w_v.weight', 11.285400390625),
-     ('llama_blocks.llama_3.attention.multihead.out_proj.weight', 11.12060546875),
-     ('llama_blocks.llama_2.attention.w_v.weight', 10.68115234375),
-     ('llama_blocks.llama_0.feedforward.0.weight', 10.4248046875),
-     ('llama_blocks.llama_2.attention.multihead.out_proj.weight', 10.36376953125),
-     ('llama_blocks.llama_1.attention.multihead.out_proj.weight', 10.2783203125),
-     ('llama_blocks.llama_3.attention.multihead.out_proj.bias', 10.15625),
-     ('llama_blocks.llama_3.attention.w_v.weight', 9.991455078125),
-     ('llama_blocks.llama_0.feedforward.1.linear.weight', 9.9609375),
-     ('llama_blocks.llama_1.attention.multihead.in_proj_weight',
-      9.908040364583334),
-     ('llama_blocks.llama_2.attention.multihead.in_proj_weight', 9.75341796875),
-     ('llama_blocks.llama_0.feedforward.1.linear_gate.weight', 9.66796875),
-     ('llama_blocks.llama_1.attention.multihead.out_proj.bias', 9.375),
-     ('llama_blocks.llama_3.attention.multihead.in_proj_weight', 9.16748046875),
-     ('llama_blocks.llama_1.feedforward.0.weight', 8.77685546875),
-     ('llama_blocks.llama_0.feedforward.1.linear_gate.bias', 8.59375),
-     ('llama_blocks.llama_2.feedforward.1.linear.bias', 8.59375),
-     ('llama_blocks.llama_2.feedforward.0.weight', 8.4228515625),
-     ('llama_blocks.llama_1.feedforward.1.linear.weight', 7.720947265625),
-     ('llama_blocks.llama_1.feedforward.1.linear_gate.weight', 7.501220703125),
-     ('llama_blocks.llama_3.feedforward.0.weight', 7.440185546875),
-     ('llama_blocks.llama_2.feedforward.1.linear.weight', 7.31201171875),
-     ('llama_blocks.llama_2.feedforward.1.linear_gate.weight', 7.196044921875),
-     ('llama_blocks.llama_1.feedforward.1.linear_gate.bias', 7.03125),
-     ('llama_blocks.llama_2.attention.multihead.out_proj.bias', 7.03125),
-     ('llama_blocks.llama_2.feedforward.1.linear_gate.bias', 7.03125),
-     ('llama_blocks.llama_2.attention.w_k.weight', 6.94580078125),
-     ('llama_blocks.llama_3.feedforward.1.linear.weight', 6.927490234375),
-     ('llama_blocks.llama_1.attention.w_k.weight', 6.82373046875),
-     ('llama_blocks.llama_2.attention.w_q.weight', 6.82373046875),
-     ('llama_blocks.llama_3.attention.w_k.weight', 6.585693359375),
-     ('llama_blocks.llama_3.feedforward.1.linear_gate.weight', 6.494140625),
-     ('llama_blocks.llama_1.attention.w_q.weight', 6.396484375),
-     ('llama_blocks.llama_1.feedforward.1.linear.bias', 6.25),
-     ('llama_blocks.llama_3.feedforward.1.linear.bias', 6.25),
-     ('llama_blocks.llama_3.attention.w_q.weight', 6.2255859375),
-     ('ffn.0.weight', 5.633544921875),
-     ('llama_blocks.llama_0.feedforward.1.linear.bias', 5.46875),
-     ('ffn.1.linear_gate.bias', 5.46875),
-     ('ffn.1.linear_gate.weight', 5.2978515625),
-     ('ffn.1.linear.weight', 5.26123046875),
-     ('ffn.2.weight', 4.447115384615385),
-     ('ffn.1.linear.bias', 3.90625),
-     ('llama_blocks.llama_0.feedforward.0.bias', 3.125),
-     ('ffn.2.bias', 3.076923076923077),
-     ('llama_blocks.llama_3.feedforward.0.bias', 2.34375),
-     ('ffn.0.bias', 2.34375),
-     ('llama_blocks.llama_0.attention.multihead.out_proj.bias', 1.5625),
-     ('llama_blocks.llama_2.feedforward.0.bias', 1.5625),
-     ('llama_blocks.llama_3.feedforward.1.linear_gate.bias', 1.5625),
-     ('llama_blocks.llama_1.feedforward.0.bias', 0.78125),
-     ('embeddings.weight', 0.7572115384615384),
-     ('llama_blocks.llama_0.rms.scale', 0.146484375),
-     ('llama_blocks.llama_0.feedforward.1.beta', 0.0),
-     ('llama_blocks.llama_1.rms.scale', 0.0),
-     ('llama_blocks.llama_1.feedforward.1.beta', 0.0),
-     ('llama_blocks.llama_2.rms.scale', 0.0),
-     ('llama_blocks.llama_2.feedforward.1.beta', 0.0),
-     ('llama_blocks.llama_3.rms.scale', 0.0),
-     ('llama_blocks.llama_3.feedforward.1.beta', 0.0),
-     ('ffn.1.beta', 0.0)]
-
-
 
 Here, for all of our parameter gradients, the vast majority are non-zero, which is great. If we start to see this number peak higher, then our gradients would not be flowing.
 
@@ -1465,211 +1393,10 @@ scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(llama_optimizer, 300, eta
 train(llama_with_cosine, llama_optimizer, scheduler=scheduler)
 ```
 
-    model params: 733382
-
-
-    /Users/bkitano/Desktop/projects/llama/.llama/lib/python3.11/site-packages/torch/optim/lr_scheduler.py:814: UserWarning: To get the last learning rate computed by the scheduler, please use `get_last_lr()`.
-      warnings.warn("To get the last learning rate computed by the scheduler, "
-
-
-    lr:  [0.0009999457184159408]
-    lr:  [0.0009961510274583004]
-    lr:  [0.0009869757772816292]
-    lr:  [0.0009725204933511963]
-    lr:  [0.0009529435502760634]
-    lr:  [0.0009284594366176498]
-    lr:  [0.0008993364049014041]
-    lr:  [0.0008658935325782156]
-    lr:  [0.0008284972261358946]
-    lr:  [0.0007875572066618724]
-    lr:  [0.0007435220208394261]
-    lr:  [0.0006968741265588948]
-    lr:  [0.0006481246069855613]
-    lr:  [0.0005978075709959357]
-    lr:  [0.0005464743013294258]
-    lr:  [0.0004946872145648923]
-    lr:  [0.00044301369909075325]
-    lr:  [0.00039201989856974814]
-    lr:  [0.0003422645089892466]
-    lr:  [0.0002942926572257539]
-    lr:  [0.0002486299281339155]
-    lr:  [0.0002057766054928797]
-    lr:  [0.00016620218969383484]
-    lr:  [0.00013034025177986015]
-    lr:  [9.858367916643242e-05]
-    lr:  [7.128036241775617e-05]
-    lr:  [4.872936226262451e-05]
-    lr:  [3.117756953567661e-05]
-    lr:  [1.8816750064937722e-05]
-    lr:  [1.1779739336260682e-05]
-    lr:  [1.0054282328142978e-05]
-    lr:  [1.396862020283371e-05]
-    lr:  [2.3138198807489664e-05]
-    lr:  [3.7591595433673565e-05]
-    lr:  [5.716757986058726e-05]
-    lr:  [8.165110310035915e-05]
-    lr:  [0.00011077372717831143]
-    lr:  [0.00014421629539013414]
-    lr:  [0.00018161236159547207]
-    lr:  [0.00022255218257041353]
-    lr:  [0.000266587198202317]
-    lr:  [0.0003132349418762423]
-    lr:  [0.0003619843243986437]
-    lr:  [0.00041230123246673267]
-    lr:  [0.0004636343798727907]
-    lr:  [0.0005154213471150504]
-    lr:  [0.0005670947431326733]
-    lr:  [0.0006180884215964123]
-    lr:  [0.0006678436836148733]
-    lr:  [0.0007158153988789833]
-    lr:  [0.000761477978168448]
-    lr:  [0.0008043311317769176]
-    lr:  [0.0008439053507606739]
-    lr:  [0.0008797670509540533]
-    lr:  [0.0009115233233906334]
-    lr:  [0.0009388262390821259]
-    lr:  [0.0009613766609899272]
-    lr:  [0.0009789275214238276]
-    lr:  [0.000991286528959492]
-    lr:  [0.0009983182752167242]
-    lr:  [0.0009999457184159228]
-    lr:  [0.0009961510274582826]
-    lr:  [0.0009869757772816119]
-    lr:  [0.0009725204933511793]
-    lr:  [0.0009529435502760463]
-    lr:  [0.0009284594366176337]
-    lr:  [0.0008993364049013882]
-    lr:  [0.0008658935325782011]
-    lr:  [0.0008284972261358803]
-    lr:  [0.000787557206661859]
-    lr:  [0.0007435220208394123]
-    lr:  [0.0006968741265588827]
-    lr:  [0.0006481246069855505]
-    lr:  [0.0005978075709959258]
-    lr:  [0.0005464743013294155]
-    lr:  [0.0004946872145648846]
-    lr:  [0.0004430136990907463]
-    lr:  [0.00039201989856974174]
-    lr:  [0.0003422645089892402]
-    lr:  [0.00029429265722574944]
-    lr:  [0.0002486299281339118]
-    lr:  [0.00020577660549287596]
-    lr:  [0.00016620218969383194]
-    lr:  [0.00013034025177985776]
-    lr:  [9.85836791664316e-05]
-    lr:  [7.128036241775529e-05]
-    lr:  [4.872936226262421e-05]
-    lr:  [3.117756953567644e-05]
-    lr:  [1.8816750064937634e-05]
-    lr:  [1.1779739336260654e-05]
-    lr:  [1.0054282328142978e-05]
-    lr:  [1.396862020283372e-05]
-    lr:  [2.3138198807489698e-05]
-    lr:  [3.759159543367397e-05]
-    lr:  [5.716757986058744e-05]
-    lr:  [8.165110310035937e-05]
-    lr:  [0.00011077372717831269]
-    lr:  [0.00014421629539013508]
-    lr:  [0.0001816123615954725]
-    lr:  [0.00022255218257041364]
-    validation loss:  4.179551410675049
-
-
-
-
-
-    <Axes: >
-
-
-
-
-    
-![png](llama_files/llama_82_4.png)
-    
-
-
 
 ```python
 show_grads(llama_with_cosine, 1e-5)
 ```
-
-
-
-
-    [('llama_blocks.llama_0.attention.multihead.in_proj_bias', 100.0),
-     ('llama_blocks.llama_0.attention.multihead.out_proj.bias', 100.0),
-     ('llama_blocks.llama_1.attention.multihead.in_proj_bias', 100.0),
-     ('llama_blocks.llama_1.attention.multihead.out_proj.bias', 100.0),
-     ('llama_blocks.llama_2.attention.multihead.in_proj_bias', 100.0),
-     ('llama_blocks.llama_2.attention.multihead.out_proj.bias', 100.0),
-     ('llama_blocks.llama_3.attention.multihead.in_proj_bias', 100.0),
-     ('llama_blocks.llama_3.attention.multihead.out_proj.bias', 100.0),
-     ('llama_blocks.llama_1.feedforward.1.linear.bias', 0.78125),
-     ('llama_blocks.llama_2.feedforward.1.linear_gate.weight', 0.030517578125),
-     ('llama_blocks.llama_3.attention.w_q.weight', 0.030517578125),
-     ('llama_blocks.llama_0.attention.multihead.out_proj.weight', 0.0244140625),
-     ('llama_blocks.llama_0.feedforward.1.linear_gate.weight', 0.0244140625),
-     ('llama_blocks.llama_0.feedforward.1.linear.weight', 0.0244140625),
-     ('llama_blocks.llama_1.attention.w_v.weight', 0.0244140625),
-     ('llama_blocks.llama_1.feedforward.1.linear.weight', 0.0244140625),
-     ('llama_blocks.llama_2.attention.w_q.weight', 0.0244140625),
-     ('llama_blocks.llama_3.attention.w_v.weight', 0.0244140625),
-     ('llama_blocks.llama_3.attention.multihead.out_proj.weight', 0.0244140625),
-     ('ffn.2.weight', 0.02403846153846154),
-     ('llama_blocks.llama_0.attention.w_v.weight', 0.018310546875),
-     ('llama_blocks.llama_0.feedforward.0.weight', 0.018310546875),
-     ('llama_blocks.llama_1.feedforward.0.weight', 0.018310546875),
-     ('llama_blocks.llama_3.attention.w_k.weight', 0.018310546875),
-     ('llama_blocks.llama_3.feedforward.0.weight', 0.018310546875),
-     ('llama_blocks.llama_0.attention.multihead.in_proj_weight',
-      0.016276041666666668),
-     ('llama_blocks.llama_1.attention.multihead.out_proj.weight', 0.01220703125),
-     ('llama_blocks.llama_1.feedforward.1.linear_gate.weight', 0.01220703125),
-     ('llama_blocks.llama_3.feedforward.1.linear_gate.weight', 0.01220703125),
-     ('llama_blocks.llama_3.feedforward.1.linear.weight', 0.01220703125),
-     ('llama_blocks.llama_0.attention.w_q.weight', 0.006103515625),
-     ('llama_blocks.llama_0.attention.w_k.weight', 0.006103515625),
-     ('llama_blocks.llama_1.attention.w_q.weight', 0.006103515625),
-     ('llama_blocks.llama_1.attention.multihead.in_proj_weight', 0.006103515625),
-     ('llama_blocks.llama_2.attention.multihead.in_proj_weight', 0.006103515625),
-     ('llama_blocks.llama_2.attention.multihead.out_proj.weight', 0.006103515625),
-     ('llama_blocks.llama_2.feedforward.1.linear.weight', 0.006103515625),
-     ('llama_blocks.llama_3.attention.multihead.in_proj_weight',
-      0.004069010416666667),
-     ('embeddings.weight', 0.0),
-     ('llama_blocks.llama_0.rms.scale', 0.0),
-     ('llama_blocks.llama_0.feedforward.0.bias', 0.0),
-     ('llama_blocks.llama_0.feedforward.1.beta', 0.0),
-     ('llama_blocks.llama_0.feedforward.1.linear_gate.bias', 0.0),
-     ('llama_blocks.llama_0.feedforward.1.linear.bias', 0.0),
-     ('llama_blocks.llama_1.rms.scale', 0.0),
-     ('llama_blocks.llama_1.attention.w_k.weight', 0.0),
-     ('llama_blocks.llama_1.feedforward.0.bias', 0.0),
-     ('llama_blocks.llama_1.feedforward.1.beta', 0.0),
-     ('llama_blocks.llama_1.feedforward.1.linear_gate.bias', 0.0),
-     ('llama_blocks.llama_2.rms.scale', 0.0),
-     ('llama_blocks.llama_2.attention.w_k.weight', 0.0),
-     ('llama_blocks.llama_2.attention.w_v.weight', 0.0),
-     ('llama_blocks.llama_2.feedforward.0.weight', 0.0),
-     ('llama_blocks.llama_2.feedforward.0.bias', 0.0),
-     ('llama_blocks.llama_2.feedforward.1.beta', 0.0),
-     ('llama_blocks.llama_2.feedforward.1.linear_gate.bias', 0.0),
-     ('llama_blocks.llama_2.feedforward.1.linear.bias', 0.0),
-     ('llama_blocks.llama_3.rms.scale', 0.0),
-     ('llama_blocks.llama_3.feedforward.0.bias', 0.0),
-     ('llama_blocks.llama_3.feedforward.1.beta', 0.0),
-     ('llama_blocks.llama_3.feedforward.1.linear_gate.bias', 0.0),
-     ('llama_blocks.llama_3.feedforward.1.linear.bias', 0.0),
-     ('ffn.0.weight', 0.0),
-     ('ffn.0.bias', 0.0),
-     ('ffn.1.beta', 0.0),
-     ('ffn.1.linear_gate.weight', 0.0),
-     ('ffn.1.linear_gate.bias', 0.0),
-     ('ffn.1.linear.weight', 0.0),
-     ('ffn.1.linear.bias', 0.0),
-     ('ffn.2.bias', 0.0)]
-
-
 
 Even at an extremely low tolerance, the attention biases are not getting any signal. I'm not sure why the learning schedule from the paper doesn't work, but the lesson here is simple: start simple.
 
